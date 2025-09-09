@@ -1,18 +1,26 @@
 #Josiah Stoltzfus, Nov 25, 2024, CPT 187 W01, Project: Collection Management Tool
 
 import sqlite3
-import queries as q
+from collectors_tool import queries as q
+from collectors_tool.record import Record
+from pathlib import Path
 import os
-from python.record import Record
 conn = None
 
 #connect to database
 def connect():
     global conn
     if not conn:
-        #get absolute path to database file
-        db_directory = os.path.abspath(os.path.dirname(__file__))
-        db_file = os.path.join(db_directory, "collectorsTool.db")
+
+        BASE_DIR = Path(__file__).resolve().parent
+        print("Base:", BASE_DIR)
+
+        # data directory
+        DATA_DIR = BASE_DIR / "data"
+        print(DATA_DIR)
+        
+        db_file = DATA_DIR / "collectorsTool.db"
+        print(db_file)
         
         #check if database exists
         if os.path.exists(db_file):

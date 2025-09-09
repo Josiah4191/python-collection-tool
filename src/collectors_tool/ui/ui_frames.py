@@ -2,11 +2,12 @@
 
 import tkinter as tk
 from tkinter import ttk, IntVar
+from pathlib import Path
 from PIL import ImageTk, Image
-import database as db
-from python.record import Record
-from ui_trees import Category_Tree, Collection_Tree, Item_Tree, Source_Tree, Directory_Tree
-import account as account
+from collectors_tool import db
+from collectors_tool.record import Record
+from collectors_tool.ui.ui_trees import Category_Tree, Collection_Tree, Item_Tree, Source_Tree, Directory_Tree
+from collectors_tool import account as account
 import os
 
 '''
@@ -67,7 +68,7 @@ class Main_Frame(ttk.Frame):                              # MAIN FRAME SEARCH
         self.logout_button.place(relx=0.5, rely=1, anchor="s")
 
         #check if user account is an admin or user account
-        if account.get_account().type == "user":
+        if account.get_account() == "user":
             #if it's a user, disable the refresh/restore buttons
             self.refresh_button.configure(state="disabled")
             self.restore_button.configure(state="disabled")
@@ -113,12 +114,18 @@ class Login_Frame(ttk.Frame):
         self.welcome = ttk.Label(self.right_frame, text="Welcome!")
         self.welcome.grid(column=1, row=0)
         
-        #get absolute path to icons
-        icons_dir = os.path.abspath(os.path.dirname(__file__))
-        icons_path = os.path.join(icons_dir, "icons")
+        # folder where app.py lives (collectors_tool/)
+        BASE_DIR = Path(__file__).resolve().parents[1]
+        print("Base:", BASE_DIR)
 
-        #person icon path
-        self.person_icon_file = os.path.join(icons_path, "user.png")
+        # data directory
+        DATA_DIR = BASE_DIR / "data"
+
+        # icons folder
+        ICONS_DIR = DATA_DIR / "icons"
+
+        # individual icons
+        self.person_icon_file = ICONS_DIR / "user.png"
 
         if os.path.exists(self.person_icon_file):
             self.person_icon = Image.open(self.person_icon_file) #<a href="https://www.flaticon.com/free-icons/person" title="person icons">Person icons created by Md Tanvirul Haque - Flaticon</a>
@@ -652,7 +659,7 @@ class Add_Item_Frame(ttk.Frame):                     # ADD ITEM FRAME SEARCH
         self.submit_button.grid(column=2, row=11, sticky="nesw")
 
         #validate user
-        if account.get_account().type == "user":
+        if account.get_account() == "user":
             self.category_button.configure(state="disabled")
             self.collection_button.configure(state="disabled")
             self.submit_button.configure(state="disabled")

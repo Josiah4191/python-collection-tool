@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "name": "Run collectors_tool.app",
+      "type": "python",
+      "request": "launch",
+      "module": "collectors_tool.app",
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PYTHONPATH": "src"
+      }
+    }
+  ]
+}

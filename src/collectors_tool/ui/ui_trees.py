@@ -1,12 +1,15 @@
 #Josiah Stoltzfus, Nov 25, 2024, CPT 187 W01, Project: Collection Management Tool
 
 import tkinter as tk
-import database as db
 from tkinter import ttk
 from PIL import ImageTk, Image
-from python.record import Record
-import account as account
 import os
+
+from pathlib import Path
+from collectors_tool import db
+from collectors_tool import account
+from collectors_tool.record import Record
+from collections import defaultdict
 
 '''
 Custom Classes:
@@ -38,16 +41,48 @@ class Directory_Tree(ttk.Treeview):                     # DIRECTORY TREE SEARCH
         self.column("id", width=60, anchor="center")
         self.column("#0", width=150)
 
-        #get absolute path to icons
-        icons_dir = os.path.abspath(os.path.dirname(__file__))
-        icons_path = os.path.join(icons_dir, "icons")
 
-        #person icon path
-        self.person_icon_file = os.path.join(icons_path, "user.png")
-        #square icon path
-        self.square_icon_file = os.path.join(icons_path, "square.png")
-        #folder icon path
-        self.folder_icon_file = os.path.join(icons_path, "open-folder.png")
+        # folder where app.py lives (collectors_tool/)
+        BASE_DIR = Path(__file__).resolve().parents[1]
+
+        # data directory
+        DATA_DIR = BASE_DIR / "data"
+
+        # icons folder
+        ICONS_DIR = DATA_DIR / "icons"
+
+        def _debug_path(name: str):
+            p = ICONS_DIR / name
+            print(f"ICON DEBUG: {p} exists={p.exists()}")
+            return p
+
+        def _load_icon_or_none(name: str):
+            path = _debug_path(name)
+            if not path.exists():
+                return None
+            try:
+                img = tk.PhotoImage(file=path.as_posix())
+            except Exception:
+                try:
+                    from PIL import Image, ImageTk
+                    img = ImageTk.PhotoImage(Image.open(path))
+                except Exception as e:
+                    print(f"ICON LOAD FAIL for {name}: {e}")
+                    return None
+            return img
+
+        # Create & KEEP references
+        self.folder_icon = _load_icon_or_none("open-folder.png")
+        self.square_icon = _load_icon_or_none("square.png")
+        self.person_icon = _load_icon_or_none("user.png")
+
+        # Belt-and-suspenders cache so references live on self
+        self._icons = {"folder": self.folder_icon, "square": self.square_icon, "person": self.person_icon}
+
+        # individual icons
+        self.person_icon_file = ICONS_DIR / "user.png"
+        self.square_icon_file = ICONS_DIR / "square.png"
+        self.folder_icon_file = ICONS_DIR / "open-folder.png"
 
         if os.path.exists(self.person_icon_file):
             self.person_icon = Image.open(self.person_icon_file) #<a href="https://www.flaticon.com/free-icons/person" title="person icons">Person icons created by Md Tanvirul Haque - Flaticon</a>
@@ -85,6 +120,52 @@ class Directory_Tree(ttk.Treeview):                     # DIRECTORY TREE SEARCH
         self.category_records = db.get_active_categories()
         self.collection_records = db.get_active_collections()
         self.source_records = db.get_active_sources()
+
+
+
+        # create empty lists to collect the iids
+        self.category_iids   = []
+        self.collection_iids = []
+        self.item_iids       = []
+        self.source_iids     = []
+
+        # create empty lists to collect the ids
+        self.category_ids    = []
+        self.collection_ids  = []
+        self.item_ids        = []
+        self.source_ids      = []
+
+        # tiny helper to avoid repeated if/else for image
+        def _insert(parent, img, text, values):
+            kwargs = {"image": img} if img is not None else {}
+            return self.insert(parent, index=tk.END, text=f" {text}", values=values, **kwargs)
+
+        # populate the treeview by matching primary keys from the records
+        for category in self.category_records:
+            category_iid = _insert("", self.folder_icon, category.category_name.title(), [category.category_id])
+            self.category_iids.append(category_iid)
+            self.category_ids.append(category.category_id)
+
+            for collection in self.collection_records:
+                if category.category_id == collection.category_id:
+                    collection_iid = _insert(category_iid, self.folder_icon, collection.collection_name.title(), [collection.collection_id])
+                    self.collection_iids.append(collection_iid)
+                    self.collection_ids.append(collection.collection_id)
+
+                    for item in self.item_records:
+                        if item.collection_id == collection.collection_id:
+                            item_iid = _insert(collection_iid, self.square_icon, item.item_name.title(), [item.item_id])
+                            self.item_iids.append(item_iid)
+                            self.item_ids.append(item.item_id)
+
+                            for source in self.source_records:
+                                if item.source_id == source.source_id:
+                                    source_iid = _insert(item_iid, self.person_icon, f"{source.first_name.title()} {source.last_name.title()}", [source.source_id])
+                                    self.source_iids.append(source_iid)
+                                    self.source_ids.append(source.source_id)
+
+
+        """
 
         #create empty lists to collect the iids
         self.category_iids = []
@@ -131,91 +212,7 @@ class Directory_Tree(ttk.Treeview):                     # DIRECTORY TREE SEARCH
                                         source_iid = self.insert(item_iid, index=tk.END, text=f" {source.first_name.title()} {source.last_name.title()}", values=[source.source_id])
                                     self.source_iids.append(source_iid) # put all the source iids in a list to refer to them later
                                     self.source_ids.append(source.source_id) # put all the source_ids in a list to conect it to the source_iids
-
-            '''
-            self.combine_category_ids = dict(zip(self.category_iids, self.category_ids ))
-            self.combine_collection_ids = dict(zip(self.collection_iids, self.collection_ids))
-            self.combine_source_ids = dict(zip(self.source_iids, self.source_ids))
-            self.combine_item_ids = dict(zip(self.item_iids, self.item_ids))
-            '''
-    '''
-    #get the source record for the selected source. returns a Record object
-    def get_selected_source_record(self):
-        #get the selected iid
-        source_id = None
-        selected_iid = self.selection()[0] # get the selected iid (the selected row in the treeview) from the user
-        for iid in self.source_iids: # loop through the list of source_iids 
-            if iid == selected_iid: # check if one of the iid equals the selected_iid
-                for id in self.source_ids: # loop through the source_ids
-                    if id in self.item(selected_iid)["values"]: # check if one of the ids matches the value of the id in the selected item
-                        for source in self.source_records: #loop through the source_records to find the source with the matching id
-                            if id == source.source_id: 
-                                return source   # return the source record that matches the id
-                            
-
-    #get the item record for the selected item. returns a Record object
-    def get_selected_item_record(self):
-        #get the selected iid
-        item_id = None
-        selected_iid = self.selection()[0] # get the selected iid (the selected row in the treeview) from the user
-        for iid in self.item_iids: # loop through the list of item_iids 
-            if iid == selected_iid: # check if one of the iid equals the selected_iid
-                for id in self.item_ids: # loop through the source_ids
-                    if id in self.item(selected_iid)["values"]: # check if one of the ids matches the value of the id in the selected item
-                        for item in self.item_records: #loop through the item_records to find the item with the matching id
-                            if id == item.item_id: 
-                                return item  # return the item record that matches the id
-    
-    def get_selected_category_record(self):
-        category_id = None
-        selected_iid = self.selection()[0]
-        for iid in self.category_iids:
-            if iid == selected_iid:
-                for id in self.category_ids:
-                    if id in self.item(selected_iid)["values"]:
-                        for category in self.category_records:
-                            if id == category.category_id:
-                                return category
-                            
-    def get_selected_collection_record(self):
-        collection_id = None
-        selected_iid = self.selection()[0]
-        for iid in self.collection_iids:
-            if iid == selected_iid:
-                for id in self.collection_ids:
-                    if id in self.item(selected_iid)["values"]:
-                        for collection in self.collection_records:
-                            if id == collection.collection_id:
-                                return collection
-
-    def deactivate_record(self):
-        iid = self.selection()[0]
-        id = self.item(iid)["values"][0]
-
-        for key, value in self.combine_category_ids.items():
-            if iid == key and id == value:
-                category = self.get_selected_category_record()
-                db.deactivate_category(category.category_id)
-                self.delete(iid)
-        
-        for key, value in self.combine_collection_ids.items():
-            if iid == key and id == value:
-                collection = self.get_selected_collection_record()
-                db.deactivate_collection(collection.collection_id)
-                self.delete(iid)
-
-        for key, value in self.combine_source_ids.items():
-            if iid == key and id == value:
-                source = self.get_selected_source_record()
-                db.deactivate_source(source.source_id)
-                self.delete(iid)
-        
-        for key, value in self.combine_item_ids.items():
-            if iid == key and id == value:
-                item = self.get_selected_item_record()
-                db.deactivate_item(item.item_id)
-                self.delete(iid)
-        '''
+            """
 
 #this treeview displays and manages the source table
 class Source_Tree(ttk.Treeview):                                # SOURCE TREE SEARCH

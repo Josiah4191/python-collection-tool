@@ -1,6 +1,6 @@
 #Josiah Stoltzfus, Nov 25, 2024, CPT 187 W01, Project: Collection Management Tool
-import db as db
-from ui_frames import Root, Login_Frame
+from collectors_tool.ui.ui_frames import Login_Frame, Root
+from collectors_tool import db
 
 """
 account information:
