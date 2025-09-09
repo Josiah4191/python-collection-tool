@@ -3,6 +3,10 @@
 This project is a simple collection management tool built in Python with an SQLite database.
 
 ---
+## Notes
+This was my first Python project, built as a learning exercise.
+It is not polished, and the structure could be improved significantly (imports, path handling, UI design, database logic, etc.).
+
 ## Features
 - A basic collection tool built with Python and Tkinter. 
 - You can group things into categories, have collections inside those categories, and add items to each one. 
@@ -20,10 +24,6 @@ This project is a simple collection management tool built in Python with an SQLi
 - From the project root
   - **Windows PowerShell:** $env:PYTHONPATH="src"; python -m collectors_tool.app
   - **macOS/Linux:** PYTHONPATH=src python -m collectors_tool.app
-
-## Notes
-This was my first Python project, built as a learning exercise.
-It is not polished, and the structure could be improved significantly (imports, path handling, UI design, database logic, etc.).
 
 ## Possible Improvements
 - I spent too much time learning Tkinter and trying to make the interface “look nice,” which came at the expense of core functionality. That made the project harder to manage overall.
