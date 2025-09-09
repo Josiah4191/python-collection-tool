@@ -3,12 +3,16 @@
 This project is a simple collection management tool built in Python with an SQLite database.
 
 ---
+## Features
+- A basic collection tool built with Python and Tkinter. 
+- You can group things into categories, have collections inside those categories, and add items to each one. 
+- It also keeps track of sources (people who own the items). 
+- Everything is saved in a SQLite database, and you can add or remove categories, collections, items, and sources.
 
 ## Setup
 ### Requirements
 - Python 3.10+
-- Pillow
-  - pip install pillow
+- Pillow (pip install pillow)
 ### Run with VS Code
 - Open the project root in VS Code
 - Press F5 (launch config)
