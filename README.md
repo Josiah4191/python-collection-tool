@@ -13,6 +13,11 @@ It is not polished, and the structure could be improved significantly (imports, 
 - It also keeps track of sources (people who own the items). 
 - Everything is saved in a SQLite database, and you can add or remove categories, collections, items, and sources.
 
+## Technologies Used
+- Python 3 — main programming language
+- Tkinter — for the graphical user interface
+- SQLite — for the database and data storage
+
 ## Setup
 ### Requirements
 - Python 3.10+
