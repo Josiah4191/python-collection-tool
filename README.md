@@ -24,4 +24,9 @@ This project is a simple collection management tool built in Python with an SQLi
 ## Notes
 This was my first Python project, built as a learning exercise.
 It is not polished, and the structure could be improved significantly (imports, path handling, UI design, database logic, etc.).
-If I were to revisit it, I would likely rebuild it from scratch, possibly in Java or another language.
+
+## Possible Improvements
+- I spent too much time learning Tkinter and trying to make the interface “look nice,” which came at the expense of core functionality. That made the project harder to manage overall.
+- The classes aren’t separated into their own files, which makes the code harder to maintain.
+- This was my first real program, and I didn’t know much about design patterns or project structure. I did try to separate the code as best I could at the time, but I’ve learned a lot since then and would approach it very differently today.
+- The problems with this project are so numerous that if I were to revisit it, I would just start from scratch and completely redesign the entire thing.
