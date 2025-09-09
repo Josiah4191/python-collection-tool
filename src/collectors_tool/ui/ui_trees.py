@@ -164,56 +164,6 @@ class Directory_Tree(ttk.Treeview):                     # DIRECTORY TREE SEARCH
                                     self.source_iids.append(source_iid)
                                     self.source_ids.append(source.source_id)
 
-
-        """
-
-        #create empty lists to collect the iids
-        self.category_iids = []
-        self.collection_iids = []
-        self.item_iids = []
-        self.source_iids = []
-
-        #create empty lists to collect the id for each row in their respective tables within the database
-        self.category_ids = []
-        self.collection_ids = []
-        self.item_ids = []
-        self.source_ids = []
-
-        #populate the treeview by matching primary keys from the records
-        for category in self.category_records: #loop through the category records
-            #the insert method returns the iid of the item that was inserted
-            if self.folder_icon:
-                category_iid = self.insert("", index=tk.END, image=self.folder_icon, text=f" {category.category_name.title()}", values=[category.category_id])
-            else:
-                category_iid = self.insert("", index=tk.END, text=f" {category.category_name.title()}", values=[category.category_id])
-            self.category_iids.append(category_iid) # put all the category iids in a list
-            self.category_ids.append(category.category_id) #put each category id in a list
-            for collection in self.collection_records: #loop through collection records
-                if category.category_id == collection.category_id: #check if category_ids match
-                    if self.folder_icon:
-                        collection_iid = self.insert(category_iid, image=self.folder_icon, index=tk.END, text=f" {collection.collection_name.title()}", values=[collection.collection_id])
-                    else:
-                        collection_iid = self.insert(category_iid, index=tk.END, text=f" {collection.collection_name.title()}", values=[collection.collection_id])
-                    self.collection_iids.append(collection_iid) # put all the collection iids in a list to refer to them later
-                    self.collection_ids.append(collection.collection_id) # put the collection_id in a list to connect it to the collection_iids
-                    for item in self.item_records: #loop through item records
-                        if item.collection_id == collection.collection_id: #check if the collection_ids match
-                            if self.square_icon:
-                                item_iid = self.insert(collection_iid, image=self.square_icon, index=tk.END, text=f" {item.item_name.title()}", values=[item.item_id])
-                            else:
-                                item_iid = self.insert(collection_iid, index=tk.END, text=f" {item.item_name.title()}", values=[item.item_id])
-                            self.item_iids.append(item_iid) # put all the item iids in a list to refer to them later
-                            self.item_ids.append(item.item_id) # put the item_id in a list to connect it to the item_iids
-                            for source in self.source_records: #loop through source records
-                                if item.source_id == source.source_id: #check if the source_ids match
-                                    if self.person_icon:
-                                        source_iid = self.insert(item_iid, image=self.person_icon, index=tk.END, text=f" {source.first_name.title()} {source.last_name.title()}", values=[source.source_id])
-                                    else:
-                                        source_iid = self.insert(item_iid, index=tk.END, text=f" {source.first_name.title()} {source.last_name.title()}", values=[source.source_id])
-                                    self.source_iids.append(source_iid) # put all the source iids in a list to refer to them later
-                                    self.source_ids.append(source.source_id) # put all the source_ids in a list to conect it to the source_iids
-            """
-
 #this treeview displays and manages the source table
 class Source_Tree(ttk.Treeview):                                # SOURCE TREE SEARCH
     def __init__(self, parent):
